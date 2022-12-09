@@ -7,7 +7,7 @@ import { ModeloIdentificar } from '../modelos/identificar.modelo';
   providedIn: 'root'
 })
 export class SeguridadService {
-   url='http://localhost:3000';
+  url='http://localhost:3000';
    datosUsuarioEnSesion = new BehaviorSubject<ModeloIdentificar>(new ModeloIdentificar());
 
   constructor(private http: HttpClient) { 
@@ -16,18 +16,31 @@ export class SeguridadService {
   VerificarSesionActual(){
     let datos = this.ObtenerInformacionSesion();
     if(datos){
-      this.datosUsuarioEnSesion.next(datos);
+      //this.datosUsuarioEnSesion.next(datos);
+      this.RefrescarDatosSesion(datos);
     }
-
+  
+  }
+  RefrescarDatosSesion(datos: ModeloIdentificar){
+    this.datosUsuarioEnSesion.next(datos);
   }
 
-  OptenerDatosUsuarioEnSesion(){
+  ObtenerDatosUsuarioEnSesion(){
     return this.datosUsuarioEnSesion.asObservable();
   }
 
   Identificar(usuario: string, clave: string): Observable<ModeloIdentificar>{
+   //return this.http.post("localhost:3000/IdentificarUsuario",{
+   // usuario: usuario,
+    // clave: clave
+  //},{headers: new HttpHeaders({
+
+ // })
+// })
+//}
+//}
    
-    return this.http.post<ModeloIdentificar>("${this.url}/IdentificarUsuario",{
+    return this.http.post<ModeloIdentificar>(`${this.url}/IdentificarUsuario`,{
       usuario: usuario,
       clave: clave
 
@@ -38,9 +51,10 @@ export class SeguridadService {
     })
   }
   AmacenarSesion(datos: ModeloIdentificar){
-
+    datos.estaIdentificado = true;
     let stringDatos = JSON.stringify(datos);
    localStorage.setItem("datosSesion", stringDatos);
+   this.RefrescarDatosSesion(datos);
   }
   ObtenerInformacionSesion(){
     let datosString = localStorage.getItem("datosSesion");
@@ -53,6 +67,7 @@ export class SeguridadService {
   }
   EliminarInformacionSesion(){
     localStorage.removeItem("datosSesion");
+    this.RefrescarDatosSesion(new ModeloIdentificar());
   }
   seHaIniciadoSesion(){
     let datosString = localStorage.getItem("datosSesion");

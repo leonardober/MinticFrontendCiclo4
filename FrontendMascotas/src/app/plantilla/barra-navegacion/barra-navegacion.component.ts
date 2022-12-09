@@ -9,19 +9,23 @@ import { SeguridadService } from 'src/app/servicios/seguridad.service';
   styleUrls: ['./barra-navegacion.component.css']
 })
 export class BarraNavegacionComponent implements OnInit {
-  seInicioSesion: boolean = false;
+  
+  seInicioSesion: boolean = false;  //Valida si se inicio sesion
   subs:  Subscription = new Subscription;
 
   constructor(private seguridadServicio: SeguridadService) { }
 
   ngOnInit(): void {
 
-    this.subs = this.seguridadServicio.OptenerDatosUsuarioEnSesion().subscribe((datos:ModeloIdentificar) => {
-      if(datos){
-       this.seInicioSesion= true;
+    this.subs = this.seguridadServicio.ObtenerDatosUsuarioEnSesion().subscribe((datos:ModeloIdentificar) => {
+      if(datos.estaIdentificado){
+        this.seInicioSesion = true;
       }else{
-        this.seInicioSesion= false;
+        this.seInicioSesion = false;
       }
+      
+      
+     this.seInicioSesion = datos.estaIdentificado;
     })
   }
 
